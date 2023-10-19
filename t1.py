@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 
@@ -67,77 +69,49 @@ def move(state, direction):
     i, j = find_empty_cell(state[0])
     if can_move(state, direction):
         new_matrix = move_cell(state[0].copy(), i, j, direction)
-        return (new_matrix, i, j)
+        return new_matrix, i, j
     return None
 
 
-# if __name__ == "__main__":
-#     initial_board = list(map(int, input("Please enter a list of numbers separated by comma: ").split(',')))
-#     # 7, 6, 8, 4, 0, 2, 5, 3, 1 - exemplu de input
-#     directions = ['up', 'down', 'right', 'left']
-#
-#     initial_state = init_state(initial_board)
-#
-#     # daca dai print asa, vei obtine jocul pe o singura tabla (tine cont de vecini - sper cred)
-#     print(f'Initial state:\n {initial_state} \n')
-#
-#     state1 = move(initial_state, 'right')
-#     print(state1)
-#     state2 = move(state1, 'left')
-#     print(state2)
-#     # state3 = move(state2, 'left')
-#     # print(state3)
-#     # state4 = move(state3, 'down')
-#     # print(state4)
-#
-#     # daca dai print asa, vei obtine toate posibilitatile de mutare a lui 0 (nodurile de pe un nivel)
-#     # for i in directions:
-#     # print(move(initial_state, i), i)
-#
-
-def iddfs(initial_state, max_iterations):
-    max_depth = 0
-    iterations = 0
-    while iterations < max_iterations:
-        result = dls(initial_state, max_depth)
+def iddfs(initial_state, max_depth=50):
+    for depth in range(0, max_depth):
+        visited = []
+        result = dls(initial_state, max_depth, visited)
         if result is not None:
-            return result, iterations
-        max_depth += 1
-        iterations += 1
-
-    return None, iterations
-
-
-def dls(state, max_depth):
-    if max_depth == 0:
-        if is_final_state(state[0]):
-            return state
-        else:
-            return None
-    elif max_depth > 0:
-        for direction in directions:
-            new_state = move(state, direction)
-            if new_state is not None:
-                result = dls(new_state, max_depth - 1)
-                if result is not None:
-                    return result
+            return result
     return None
 
 
-# initial_board = [8, 6, 7, 2, 5, 4, 0, 3, 1]
-# initial_board = [2, 5, 3, 1, 0, 6, 4, 7, 8]
-initial_board = [2, 7, 5, 0, 8, 4, 3, 1, 6]
-max_iterations = 100
-directions = ['up', 'down', 'right', 'left']
-initial_state = init_state(initial_board)
-solution, iterations = iddfs(initial_state, max_iterations)
-
-if solution is not None:
-    print("Soluție găsită în", iterations, "iterații:")
-    for step in solution[0]:
-        print(step)
-else:
-    print("Nu s-a găsit o soluție în", iterations, "iterații.")
-
+def dls(state, max_depth, visited):
+    if is_final_state(state[0]):
+        return state
+    if max_depth == 0:
+        return None
+    visited.append(state[0].tolist())
+    for direction in directions:
+        new_state = move(state, direction)
+        if new_state is not None and new_state[0].tolist() not in visited:
+            result = dls(new_state, max_depth - 1, visited)
+            if result is not None:
+                return result
+    return None
 
 
+if __name__ == "__main__":
+    initial_board = list(map(int, input("Please enter a list of numbers separated by comma: ").split(',')))
+    # 7, 6, 8, 4, 0, 2, 5, 3, 1 - exemplu de input
+    # 8, 6, 7, 2, 5, 4, 0, 3, 1
+    # 2, 5, 3, 1, 0, 6, 4, 7, 8
+    directions = ['up', 'down', 'right', 'left']
+
+    start = time.time()
+    initial_state = init_state(initial_board)
+    solution= iddfs(initial_state)
+    end = time.time()
+
+    if solution is not None:
+        print("found solution in", end - start, "seconds:")
+        for step in solution[0]:
+            print(step)
+    else:
+        print("can't find solution")
