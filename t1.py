@@ -68,29 +68,68 @@ def move(state, direction):
     if can_move(state, direction):
         new_matrix = move_cell(state[0].copy(), i, j, direction)
         return (new_matrix, i, j)
-    print("\nThis move cannot be done")
     return None
 
 
-if __name__ == "__main__":
-    initial_board = list(map(int, input("Please enter a list of numbers separated by comma: ").split(',')))
-    # 7, 6, 8, 4, 0, 2, 5, 3, 1 - exemplu de input
-    directions = ['up', 'down', 'right', 'left']
+# if __name__ == "__main__":
+#     initial_board = list(map(int, input("Please enter a list of numbers separated by comma: ").split(',')))
+#     # 7, 6, 8, 4, 0, 2, 5, 3, 1 - exemplu de input
+#     directions = ['up', 'down', 'right', 'left']
+#
+#     initial_state = init_state(initial_board)
+#
+#     # daca dai print asa, vei obtine jocul pe o singura tabla (tine cont de vecini - sper cred)
+#     print(f'Initial state:\n {initial_state} \n')
+#
+#     state1 = move(initial_state, 'right')
+#     print(state1)
+#     state2 = move(state1, 'left')
+#     print(state2)
+#     # state3 = move(state2, 'left')
+#     # print(state3)
+#     # state4 = move(state3, 'down')
+#     # print(state4)
+#
+#     # daca dai print asa, vei obtine toate posibilitatile de mutare a lui 0 (nodurile de pe un nivel)
+#     # for i in directions:
+#     # print(move(initial_state, i), i)
+#
 
-    initial_state = init_state(initial_board)
+def iddfs(initial_state):
+    max_depth = 0
+    while True:
+        result = dls(initial_state, max_depth)
+        if result is not None:
+            return result
+        max_depth += 1
 
-    # daca dai print asa, vei obtine jocul pe o singura tabla (tine cont de vecini - sper cred)
-    print(f'Initial state:\n {initial_state} \n')
 
-    state1 = move(initial_state, 'right')
-    print(state1)
-    state2 = move(state1, 'left')
-    print(state2)
-    # state3 = move(state2, 'left')
-    # print(state3)
-    # state4 = move(state3, 'down')
-    # print(state4)
+def dls(state, max_depth):
+    if max_depth == 0:
+        if is_final_state(state[0]):
+            return state
+        else:
+            return None
+    elif max_depth > 0:
+        for direction in directions:
+            new_state = move(state, direction)
+            if new_state is not None:
+                result = dls(new_state, max_depth - 1)
+                if result is not None:
+                    return result
+    return None
 
-    # daca dai print asa, vei obtine toate posibilitatile de mutare a lui 0 (nodurile de pe un nivel)
-    # for i in directions:
-    # print(move(initial_state, i), i)
+
+# initial_board = [8, 6, 7, 2, 5, 4, 0, 3, 1]
+# initial_board = [2, 5, 3, 1, 0, 6, 4, 7, 8]
+initial_board = [2, 7, 5, 0, 8, 4, 3, 1, 6]
+directions = ['up', 'down', 'right', 'left']
+initial_state = init_state(initial_board)
+solution = iddfs(initial_state)
+
+if solution is not None:
+    print("Soluție găsită:")
+    for step in solution[0]:
+        print(step)
+else:
+    print("Nu s-a găsit o soluție.")
