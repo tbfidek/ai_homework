@@ -95,13 +95,17 @@ def move(state, direction):
 #     # print(move(initial_state, i), i)
 #
 
-def iddfs(initial_state):
+def iddfs(initial_state, max_iterations):
     max_depth = 0
-    while True:
+    iterations = 0
+    while iterations < max_iterations:
         result = dls(initial_state, max_depth)
         if result is not None:
-            return result
+            return result, iterations
         max_depth += 1
+        iterations += 1
+
+    return None, iterations
 
 
 def dls(state, max_depth):
@@ -123,13 +127,17 @@ def dls(state, max_depth):
 # initial_board = [8, 6, 7, 2, 5, 4, 0, 3, 1]
 # initial_board = [2, 5, 3, 1, 0, 6, 4, 7, 8]
 initial_board = [2, 7, 5, 0, 8, 4, 3, 1, 6]
+max_iterations = 100
 directions = ['up', 'down', 'right', 'left']
 initial_state = init_state(initial_board)
-solution = iddfs(initial_state)
+solution, iterations = iddfs(initial_state, max_iterations)
 
 if solution is not None:
-    print("Soluție găsită:")
+    print("Soluție găsită în", iterations, "iterații:")
     for step in solution[0]:
         print(step)
 else:
-    print("Nu s-a găsit o soluție.")
+    print("Nu s-a găsit o soluție în", iterations, "iterații.")
+
+
+
