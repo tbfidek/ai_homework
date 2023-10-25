@@ -23,6 +23,13 @@ def euclidean_distance(state):
                for b, g in ((state[0][i,j], goal[i,j]),) if state[0][i,j] != 0)
 
 
+def chebyshev_distance(state):
+    goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+    return max(abs(b % 3 - g % 3) + abs(b // 3 - g // 3)
+               for i in range(3) for j in range(3)
+               for b, g in ((state[0][i, j], goal[i, j]),) if state[0][i, j] != 0)
+
+
 def greedy(init_state, heuristic):
     pq = []
     init_state_hashable = (tuple(map(tuple, init_state[0])), init_state[1], init_state[2])
@@ -56,7 +63,7 @@ if __name__ == "__main__":
 
     start = time.time()
     initial_state = init_state(initial_board)
-    solution = greedy(initial_state,euclidean_distance)
+    solution = greedy(initial_state,chebyshev_distance)
     end = time.time()
 
     if solution is not None:
