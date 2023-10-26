@@ -18,24 +18,25 @@ if __name__ == "__main__":
         initial_state = init_state(instance)
         print(f"Instance {i + 1}:")
 
-        for j, heuristic in enumerate(heuristics):
-            if j == 0:
+        for j, strategy in enumerate(strategies):
+            if strategy == "IDDFS":
                 print("IDDFS:")
                 start_time = time.time()
-                solution = iddfs(initial_state)
+                solution, counter = iddfs(initial_state)
             else:
-                print(f"Greedy ({heuristics[j-1].__name__}):")
+                heuristic = heuristics[j - 1]  
+                print(f"{strategy}:")
                 start_time = time.time()
-                solution = greedy(initial_state, heuristic)
+                solution, counter = greedy(initial_state, heuristic)
 
             end_time = time.time()
             if solution is not None:
-                print(f"Solution found in {end_time - start_time:.2f} seconds.")
-                print(f"Solution length: {len(solution[0])} moves.")
+                print(f"Solution found in {end_time - start_time:.6f} seconds.")
+                print(f"Solution length: {counter} moves.")
                 for step in solution[0]:
                     print(step)
             else:
                 print("No solution found.")
             print()
+    print("----------")
 
-        print("----------")

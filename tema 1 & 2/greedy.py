@@ -32,6 +32,7 @@ def chebyshev_distance(state):
 
 def greedy(init_state, heuristic):
     pq = []
+    moves_count = 0
     init_state_hashable = (tuple(map(tuple, init_state[0])), init_state[1], init_state[2])
     heapq.heappush(pq, (heuristic(init_state), init_state_hashable))
     visited = {init_state_hashable}
@@ -41,7 +42,7 @@ def greedy(init_state, heuristic):
         state = (np.array(state_hashable[0]), state_hashable[1], state_hashable[2])
 
         if is_final_state(state[0]):
-            return state
+            return state, moves_count
 
         for direction in directions:
             neighbor = move(state, direction)
@@ -50,6 +51,7 @@ def greedy(init_state, heuristic):
                 if neighbor_hashable not in visited:
                     heapq.heappush(pq, (heuristic(neighbor), neighbor_hashable))
                     visited.add(neighbor_hashable)
+                    moves_count += 1
 
     return None
 
@@ -63,7 +65,7 @@ if __name__ == "__main__":
 
     start = time.time()
     initial_state = init_state(initial_board)
-    solution = greedy(initial_state,chebyshev_distance)
+    solution = greedy(initial_state, chebyshev_distance)
     end = time.time()
 
     if solution is not None:

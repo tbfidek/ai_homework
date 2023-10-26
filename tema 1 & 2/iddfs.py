@@ -2,16 +2,20 @@ from puzzle import init_state, is_final_state, find_empty_cell, can_move, move_c
 import time
 
 directions = ['up', 'down', 'right', 'left']
+move_counter = 0
+
 def iddfs(initial_state, max_depth=50):
+    global move_counter
     for depth in range(0, max_depth):
         visited = []
         result = dls(initial_state, max_depth, visited)
         if result is not None:
-            return result
+            return result, move_counter
     return None
 
 
 def dls(state, max_depth, visited):
+    global move_counter
     if is_final_state(state[0]):
         return state
     if max_depth == 0:
@@ -20,6 +24,7 @@ def dls(state, max_depth, visited):
     for direction in directions:
         new_state = move(state, direction)
         if new_state is not None and new_state[0].tolist() not in visited:
+            move_counter += 1
             result = dls(new_state, max_depth - 1, visited)
             if result is not None:
                 return result
