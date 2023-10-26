@@ -4,30 +4,48 @@ import heapq
 import time
 
 directions = ['up', 'down', 'right', 'left']
+
+
+# sums the horizontal and vertical distances of each tile from its goal position
+# measures the number of moves needed to place each tile in its correct spot
 def manhattan_distance(state):
     goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
-    return sum(abs(b % 3 - g % 3) + abs(b // 3 - g // 3)
-               for i in range(3) for j in range(3)
-               for b, g in ((state[0][i, j], goal[i, j]),) if state[0][i, j] != 0)
+
+    total_distance = 0
+
+    for i in range(3):
+        for j in range(3):
+            current_tile = state[0][i, j]
+            if current_tile != 0:
+                goal_row, goal_col = divmod(current_tile - 1, 3)
+                horizontal_distance = abs(j - goal_col)
+                vertical_distance = abs(i - goal_row)
+                total_distance += horizontal_distance + vertical_distance
+
+    return total_distance
 
 
+# counts the number of tiles that are not in their goal positions 
 def hamming_distance(state):
     goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
-    return sum(el1 != el2 for el1, el2 in zip(state[0].flatten(), goal.flatten()) if el1 != 0 and el1 != 0)
+    return sum(current_tile != goal_tile for current_tile, goal_tile in zip(state[0].flatten(), goal.flatten()) if current_tile != 0)
 
 
+# tile positions become points with coordinates 
+# calculates the  straight line distance between current & goal
 def euclidean_distance(state):
     goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
-    return sum(np.sqrt((b % 3 - g % 3) ** 2 + (b // 3 - g // 3) ** 2)
+    return sum(np.sqrt((current_tile % 3 - goal_tile % 3) ** 2 + (current_tile // 3 - goal_tile // 3) ** 2)
                for i in range(3) for j in range(3)
-               for b, g in ((state[0][i,j], goal[i,j]),) if state[0][i,j] != 0)
+               for current_tile, goal_tile in ((state[0][i,j], goal[i,j]),) if state[0][i,j] != 0)
 
 
+# finds the maximum of the horizontal and vertical distances of each tile from its goal position
 def chebyshev_distance(state):
     goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
-    return max(abs(b % 3 - g % 3) + abs(b // 3 - g // 3)
+    return max(abs(current_tile % 3 - goal_tile % 3) + abs(current_tile // 3 - goal_tile // 3)
                for i in range(3) for j in range(3)
-               for b, g in ((state[0][i, j], goal[i, j]),) if state[0][i, j] != 0)
+               for current_tile, goal_tile in ((state[0][i, j], goal[i, j]),) if state[0][i, j] != 0)
 
 
 def greedy(init_state, heuristic):

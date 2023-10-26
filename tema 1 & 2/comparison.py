@@ -26,9 +26,8 @@ if __name__ == "__main__":
                 solution, counter = iddfs(initial_state)
             elif strategy == "A*":
                 print("A*:")
-                counter = 0
                 start_time = time.time()
-                solution = a_star(initial_state)
+                solution, counter = a_star(initial_state)
             else:
                 heuristic = heuristics[j - 2]
                 print(f"{strategy}:")
