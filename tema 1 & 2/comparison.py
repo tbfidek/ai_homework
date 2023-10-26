@@ -28,9 +28,9 @@ if __name__ == "__main__":
                 print("A*:")
                 counter = 0
                 start_time = time.time()
-                solution[-1] = a_star(initial_state)
+                solution = a_star(initial_state)
             else:
-                heuristic = heuristics[j - 2]  
+                heuristic = heuristics[j - 2]
                 print(f"{strategy}:")
                 start_time = time.time()
                 solution, counter = greedy(initial_state, heuristic)
@@ -39,10 +39,13 @@ if __name__ == "__main__":
             if solution is not None:
                 print(f"Solution found in {end_time - start_time:.6f} seconds.")
                 print(f"Solution length: {counter} moves.")
-                for step in solution[0]:
-                    print(step)
+                if strategy == "A*":
+                    for step in solution[-1]:
+                        print(step)
+                else:
+                    for step in solution[0]:
+                        print(step)
             else:
                 print("No solution found.")
             print()
     print("----------")
-
