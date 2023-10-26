@@ -1,7 +1,7 @@
 from puzzle import init_state, is_final_state, find_empty_cell, can_move, move_cell, move
 import time
 
-
+directions = ['up', 'down', 'right', 'left']
 def iddfs(initial_state, max_depth=50):
     for depth in range(0, max_depth):
         visited = []

@@ -3,7 +3,7 @@ import numpy as np
 import heapq
 import time
 
-
+directions = ['up', 'down', 'right', 'left']
 def manhattan_distance(state):
     goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
     return sum(abs(b % 3 - g % 3) + abs(b // 3 - g // 3)
