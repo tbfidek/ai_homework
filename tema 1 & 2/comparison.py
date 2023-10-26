@@ -1,6 +1,7 @@
 from puzzle import init_state, is_final_state, move
 from greedy import greedy, manhattan_distance, hamming_distance, euclidean_distance, chebyshev_distance
 from iddfs import iddfs
+from a_star import a_star
 import time
 
 if __name__ == "__main__":
@@ -12,7 +13,7 @@ if __name__ == "__main__":
 
     heuristics = [manhattan_distance, hamming_distance, euclidean_distance, chebyshev_distance]
 
-    strategies = ["IDDFS", "Greedy (Manhattan)", "Greedy (Hamming)", "Greedy (Euclidean)", "Greedy (Chebyshev)"]
+    strategies = ["IDDFS", "A*", "Greedy (Manhattan)", "Greedy (Hamming)", "Greedy (Euclidean)", "Greedy (Chebyshev)"]
 
     for i, instance in enumerate(instances):
         initial_state = init_state(instance)
@@ -23,8 +24,13 @@ if __name__ == "__main__":
                 print("IDDFS:")
                 start_time = time.time()
                 solution, counter = iddfs(initial_state)
+            elif strategy == "A*":
+                print("A*:")
+                counter = 0
+                start_time = time.time()
+                solution[-1] = a_star(initial_state)
             else:
-                heuristic = heuristics[j - 1]  
+                heuristic = heuristics[j - 2]  
                 print(f"{strategy}:")
                 start_time = time.time()
                 solution, counter = greedy(initial_state, heuristic)

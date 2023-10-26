@@ -32,7 +32,7 @@ def is_valid(state):
     return True
 
 
-# heuristic that checks the distance between current state and final state with manhattan
+# manhattan heuristic that checks the distance between current state and final state 
 def h(state):
     distance = 0
     for i in range(3):
@@ -51,7 +51,7 @@ def h(state):
 
 
 # manhattan heuristic to check distance between state and neighbor
-def dist(state,neighbor):
+def dist(state, neighbor):
     distance = 0
     for i in range(3):
         for j in range(3):
@@ -105,14 +105,14 @@ if __name__ == "__main__":
     # 2, 7, 5, 0, 8, 4, 3, 1, 6 - exemplu de input
     # 8, 6, 7, 2, 5, 4, 0, 3, 1
     # 2, 5, 3, 1, 0, 6, 4, 7, 8
-    directions = ['up', 'down', 'right', 'left']
 
+    directions = ['up', 'down', 'right', 'left']
     initial_state = init_state(initial_board)
     solution = a_star(initial_state)
 
     if solution is not None:
-        print("Found solution:")
+        print("found solution:")
         for step in solution[-1]:
             print(step)
     else:
-        print("Can't find a solution.")
+        print("can't find a solution.")
