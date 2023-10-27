@@ -5,6 +5,7 @@ import heapq
 
 directions = ['up', 'down', 'right', 'left']
 
+
 # manhattan heuristic that checks the distance between current state and final state 
 def h(state):
     distance = 0
@@ -23,23 +24,13 @@ def h(state):
     return distance
 
 
-# manhattan heuristic to check distance between state and neighbor
-def dist(state, neighbor):
-    distance = 0
-    for i in range(3):
-        for j in range(3):
-            tile = state[0][i, j]
-            if tile != 0:
-                goal_row, goal_col = divmod(tile - 1, 3)
-                distance += abs(i - goal_row) + abs(j - goal_col)
-    return distance
-
 
 def a_star(initial_state):
+    came_from = {}
     d = {}  # distance from initial state to current
     initial_state_hashable = tuple(map(tuple, initial_state[0]))
     d[initial_state_hashable] = 0
-    f = {initial_state_hashable: h(initial_state)}  # estimated total cost to final state
+    f = {initial_state_hashable: h(initial_state)}
     pq = []
     moves_counter = 0
     heapq.heappush(pq, (f[initial_state_hashable], initial_state_hashable))
@@ -49,18 +40,27 @@ def a_star(initial_state):
         state = (np.array(state_hashable), state_hashable[1], state_hashable[2])
 
         if is_final_state(state[0]):
-            return state_hashable, moves_counter
+            return reconstruct_path(state_hashable, came_from), len(came_from)
 
         for direction in directions:
             neighbor = move(state, direction)
             if neighbor:
                 neighbor_hashable = tuple(map(tuple, neighbor[0]))
-                if neighbor_hashable not in d or d[neighbor_hashable] > d[state_hashable] + dist(state,neighbor):
-                    d[neighbor_hashable] = d[state_hashable] + dist(state, neighbor)
+                if neighbor_hashable not in d or d[neighbor_hashable] > d[state_hashable] + h(state):
+                    d[neighbor_hashable] = d[state_hashable] + h(state)
                     f[neighbor_hashable] = d[neighbor_hashable] + h(neighbor)
+                    came_from[neighbor_hashable] = state_hashable
                     heapq.heappush(pq, (f[neighbor_hashable], neighbor_hashable))
                     moves_counter += 1
     return None
+
+
+def reconstruct_path(state_hashable, came_from):
+    path = [state_hashable]
+    while state_hashable in came_from:
+        state_hashable = came_from[state_hashable]
+        path.append(state_hashable)
+    return list(reversed(path))
 
 
 if __name__ == "__main__":
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     if solution is not None:
         print("found solution:")
-        for step in solution[0]:
+        for step in solution[-1]:
             print(step)
     else:
         print("can't find a solution.")
