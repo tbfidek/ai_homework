@@ -32,7 +32,6 @@ def a_star(initial_state):
     d[initial_state_hashable] = 0
     f = {initial_state_hashable: h(initial_state)}
     pq = []
-    moves_counter = 0
     heapq.heappush(pq, (f[initial_state_hashable], initial_state_hashable))
 
     while pq:
@@ -40,7 +39,7 @@ def a_star(initial_state):
         state = (np.array(state_hashable), state_hashable[1], state_hashable[2])
 
         if is_final_state(state[0]):
-            return reconstruct_path(state_hashable, came_from), len(came_from)
+            return state, len(came_from)
 
         for direction in directions:
             neighbor = move(state, direction)
@@ -51,16 +50,7 @@ def a_star(initial_state):
                     f[neighbor_hashable] = d[neighbor_hashable] + h(neighbor)
                     came_from[neighbor_hashable] = state_hashable
                     heapq.heappush(pq, (f[neighbor_hashable], neighbor_hashable))
-                    moves_counter += 1
     return None
-
-
-def reconstruct_path(state_hashable, came_from):
-    path = [state_hashable]
-    while state_hashable in came_from:
-        state_hashable = came_from[state_hashable]
-        path.append(state_hashable)
-    return list(reversed(path))
 
 
 if __name__ == "__main__":

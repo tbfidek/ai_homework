@@ -38,12 +38,8 @@ if __name__ == "__main__":
             if solution is not None:
                 print(f"Solution found in {end_time - start_time:.6f} seconds.")
                 print(f"Solution length: {counter} moves.")
-                if strategy == "A*":
-                    for step in solution[-1]:
-                        print(step)
-                else:
-                    for step in solution[0]:
-                        print(step)
+                for step in solution[0]:
+                    print(step)
             else:
                 print("No solution found.")
             print()
