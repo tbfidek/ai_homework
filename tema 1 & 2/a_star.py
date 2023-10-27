@@ -5,7 +5,7 @@ import heapq
 
 directions = ['up', 'down', 'right', 'left']
 
-
+# for checking the neighbors
 def is_valid(state):
     i, j = find_empty_cell(state[0])
 
@@ -67,7 +67,7 @@ def a_star(initial_state):
     d = {}  # distance from initial state to current
     initial_state_hashable = tuple(map(tuple, initial_state[0]))
     d[initial_state_hashable] = 0
-    f = {initial_state_hashable: h(initial_state)}
+    f = {initial_state_hashable: h(initial_state)}  # estimated total cost to final state
     pq = []
     moves_counter = 0
     heapq.heappush(pq, (f[initial_state_hashable], initial_state_hashable))
@@ -77,7 +77,7 @@ def a_star(initial_state):
         state = (np.array(state_hashable), state_hashable[1], state_hashable[2])
 
         if is_final_state(state[0]):
-            return reconstruct_path(state_hashable, came_from), moves_counter
+            return state_hashable, moves_counter
 
         for direction in directions:
             neighbor = move(state, direction)
@@ -92,14 +92,6 @@ def a_star(initial_state):
     return None
 
 
-def reconstruct_path(state_hashable, came_from):
-    path = [state_hashable]
-    while state_hashable in came_from:
-        state_hashable = came_from[state_hashable]
-        path.append(state_hashable)
-    return list(reversed(path))
-
-
 if __name__ == "__main__":
     initial_board = list(map(int, input("Please enter a list of numbers separated by comma: ").split(',')))
     # 2, 7, 5, 0, 8, 4, 3, 1, 6 - exemplu de input
@@ -112,7 +104,7 @@ if __name__ == "__main__":
 
     if solution is not None:
         print("found solution:")
-        for step in solution[-1]:
+        for step in solution[0]:
             print(step)
     else:
         print("can't find a solution.")
