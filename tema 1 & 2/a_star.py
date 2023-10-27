@@ -5,33 +5,6 @@ import heapq
 
 directions = ['up', 'down', 'right', 'left']
 
-# for checking the neighbors
-def is_valid(state):
-    i, j = find_empty_cell(state[0])
-
-    if can_move(state, "up"):
-        new_i, new_j = i - 1, j
-        if state[0][new_i, new_j] == 0:
-            return False
-
-    if can_move(state, "down"):
-        new_i, new_j = i + 1, j
-        if state[0][new_i, new_j] == 0:
-            return False
-
-    if can_move(state, "left"):
-        new_i, new_j = i, j - 1
-        if state[0][new_i, new_j] == 0:
-            return False
-
-    if can_move(state, "right"):
-        new_i, new_j = i, j + 1
-        if state[0][new_i, new_j] == 0:
-            return False
-
-    return True
-
-
 # manhattan heuristic that checks the distance between current state and final state 
 def h(state):
     distance = 0
@@ -63,7 +36,6 @@ def dist(state, neighbor):
 
 
 def a_star(initial_state):
-    came_from = {}
     d = {}  # distance from initial state to current
     initial_state_hashable = tuple(map(tuple, initial_state[0]))
     d[initial_state_hashable] = 0
@@ -86,7 +58,6 @@ def a_star(initial_state):
                 if neighbor_hashable not in d or d[neighbor_hashable] > d[state_hashable] + dist(state,neighbor):
                     d[neighbor_hashable] = d[state_hashable] + dist(state, neighbor)
                     f[neighbor_hashable] = d[neighbor_hashable] + h(neighbor)
-                    came_from[neighbor_hashable] = state_hashable
                     heapq.heappush(pq, (f[neighbor_hashable], neighbor_hashable))
                     moves_counter += 1
     return None
