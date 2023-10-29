@@ -1,5 +1,6 @@
 import copy
 
+
 # generates domains for each cell 
 def generate_domains(grid):
     domains = []
@@ -96,7 +97,7 @@ def fwd_checking(board, domains):
         return board
 
     row, col = next_unassigned_variable(board)
-    
+
     if row is not None and col is not None:
         for value in domains[row][col]:
             if possible(board, row, col, value):
@@ -117,6 +118,58 @@ def fwd_checking(board, domains):
     return None
 
 
+def fwd_checking(board, domains):
+    if isComplete(board):
+        return board
+
+    row, col = next_unassigned_variable(board)
+
+    if row is not None and col is not None:
+        for value in domains[row][col]:
+            if possible(board, row, col, value):
+                # keep the empty cell value for backtracking purposes
+                old_value = board[row][col]
+                # update the empty cell with a value
+                board[row][col] = value
+                # keep the domain values for backtracking purposes
+                domains_copy = copy.deepcopy(domains)
+                updated_domains = update_domains_FC(domains_copy, row, col, value)
+                # checks if any empty cells no longer have values in their domain => backtracking required
+                if not any(len(updated_domains[r][c]) == 0 for r, c in find_unassigned_variables(board)):
+                    result = fwd_checking(board, updated_domains)
+                    if result:
+                        return result
+                board[row][col] = old_value  # backtrack if necessary
+
+    return None
+
+
+def mrv(board, domains):
+    if isComplete(board):
+        return board
+
+    unassigned_vars = find_unassigned_variables(board)
+
+    if not unassigned_vars:
+        return board
+
+    # choose the min from unnassigned_var
+    row, col = min(unassigned_vars, key=lambda var: len(domains[var[0]][var[1]]))
+
+    for value in domains[row][col]:
+        if possible(board, row, col, value):
+            old_value = board[row][col]
+            board[row][col] = value
+            domains_copy = copy.deepcopy(domains)
+            updated_domains = update_domains_FC(domains_copy, row, col, value)
+            if not any(len(updated_domains[r][c]) == 0 for r, c in find_unassigned_variables(board)):
+                result = fwd_checking(board, updated_domains)
+                if result:
+                    return result
+            board[row][col] = old_value
+    return None
+
+
 if __name__ == "__main__":
 
     grid = [[8, 4, 0, 0, 5, 0, -1, 0, 0],
@@ -130,7 +183,7 @@ if __name__ == "__main__":
             [0, 0, -1, 0, 2, 0, 0, 1, 3]]
 
     domains = generate_domains(grid)
-    result = fwd_checking(grid, domains)
+    result = mrv(grid, domains)
 
     if result:
         for row in result:
