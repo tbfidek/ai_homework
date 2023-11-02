@@ -29,7 +29,6 @@ def isComplete(board):
 
 # checks if the move is valid
 def possible(board, row, column, number):
-
     # checks if number exists in the same row or column
     if number in board[row] or number in [board[i][column] for i in range(9)]:
         return False
@@ -47,7 +46,6 @@ def possible(board, row, column, number):
 
 # updates the domains for all peers when a move is made
 def update_domains_FC(domains, row, col, value):
-
     # updates domain for current piece
     domains[row][col] = [value]
 
@@ -92,7 +90,6 @@ def next_unassigned_variable(board):
 
 # forward checking backtracking
 def fwd_checking(board, domains):
-
     if isComplete(board):
         return board
 
@@ -170,8 +167,50 @@ def mrv(board, domains):
     return None
 
 
-if __name__ == "__main__":
+def revise(domains, row1, col1, row2, col2):
+    revised = False
 
+    values_to_remove = []
+    for value in domains[row1][col1]:
+        if value not in domains[row2][col2]:
+            values_to_remove.append(value)  # add values to be removed
+
+    for value in values_to_remove:
+        domains[row1][col1].remove(value)  # remove values that are not in the other domain
+        revised = True
+
+    return revised
+
+
+def ac3(domains):
+    queue = []
+
+    for row1 in range(9):
+        for col1 in range(9):
+            if grid[row1][col1] == 0 or grid[row1][col1] == -1:
+                for row2 in range(9):
+                    for col2 in range(9):
+                        if (row2 != row1 or col2 != col1) and (row2 == row1 or col2 == col1):
+                            queue.append((row1, col1, row2, col2))  # add arcs in queue
+
+    while queue:  # check for each arc if consistent
+        row1, col1, row2, col2 = queue.pop(0)
+
+        if revise(domains, row1, col1, row2, col2):
+            if not domains[row1][col1]:
+                return False
+
+                # check the neighbours
+            for row2 in range(9):
+                for col2 in range(9):
+                    if (row2 != row1 or col2 != col1) and (row2 != row2 or col2 != col2):
+                        if (row2 == row1 or col2 == col1) or (row2 == row2 or col2 == col2):
+                            queue.append((row2, col2, row1, col1))
+
+    return True  # no inconsistency found
+
+
+if __name__ == "__main__":
     grid = [[8, 4, 0, 0, 5, 0, -1, 0, 0],
             [3, 0, 0, 6, 0, 8, 0, 4, 0],
             [0, 0, -1, 4, 0, 9, 0, 0, -1],
@@ -183,10 +222,11 @@ if __name__ == "__main__":
             [0, 0, -1, 0, 2, 0, 0, 1, 3]]
 
     domains = generate_domains(grid)
-    result = mrv(grid, domains)
+    result = fwd_checking(grid, domains)
 
-    if result:
-        for row in result:
-            print(row)
+    if ac3(domains):
+        if result:
+            for row in result:
+                print(row)
     else:
         print("no solution found")
