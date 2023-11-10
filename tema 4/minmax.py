@@ -1,4 +1,6 @@
 # define the heuristic values
+import random
+
 PLAYER_1_WIN_VALUE = 1000
 PLAYER_2_WIN_VALUE = -1000
 DRAW_VALUE = 0
@@ -18,6 +20,15 @@ def heuristic(state):
                 new_state = transition(state, move)
                 if has_winning_combination(new_state[1]):
                     return PLAYER_2_WIN_VALUE / 2 # return value that says that the opponent could win
+
+        for move1 in range(1, 10):
+            if valid_move(state, move1):
+                new_state1 = transition(state, move1)
+                for move2 in range(1, 10):
+                    if valid_move(new_state1, move2):
+                        new_state2 = transition(new_state1, move2)
+                        if has_winning_combination(new_state2[1]):
+                            return PLAYER_2_WIN_VALUE / 4  # return value that says that the opponent could win in 2 steps
 
         return len(state[0]) - len(state[1])
 
@@ -65,7 +76,7 @@ def minimax(state, depth, alpha, beta, is_max_player):
         return heuristic(state)
 
     if is_max_player:
-        value = -float('inf') # maximazing player
+        value = -float('inf')  # maximizing player
         for move in range(1, 10):
             if valid_move(state, move):
                 new_state = transition(state, move)
@@ -75,7 +86,7 @@ def minimax(state, depth, alpha, beta, is_max_player):
                     break
         return value
     else:
-        value = float('inf') # minimizing player
+        value = float('inf')  # minimizing player
         for move in range(1, 10):
             if valid_move(state, move):
                 new_state = transition(state, move)
@@ -88,13 +99,14 @@ def minimax(state, depth, alpha, beta, is_max_player):
 
 def choose_move_minimax(state):
     available_moves = [i for i in range(1, 10) if i not in state[0] and i not in state[1]]
+    # random.shuffle(available_moves)
 
     if state[2] == 1:
         best_move = None
         best_value = -float('inf')
         for move in available_moves:
             new_state = transition(state, move)
-            value = minimax(new_state, 3, -float('inf'), float('inf'), False)  # set a finite depth
+            value = minimax(new_state, float('inf'), -float('inf'), float('inf'), False)  # set a finite depth
             if value > best_value:
                 best_value = value
                 best_move = move
