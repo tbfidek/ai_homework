@@ -19,7 +19,7 @@ def heuristic(state):
             if valid_move(state, move):
                 new_state = transition(state, move)
                 if has_winning_combination(new_state[1]):
-                    return PLAYER_2_WIN_VALUE / 2 # return value that says that the opponent could win
+                    return PLAYER_2_WIN_VALUE / 2  # return value that says that the opponent could win
 
         for move1 in range(1, 10):
             if valid_move(state, move1):
@@ -52,7 +52,6 @@ def has_winning_combination(moves):
                 if moves[i] + moves[j] + moves[k] == 15:
                     return True
     return False
-
 
 
 def valid_move(state, move):
@@ -106,7 +105,7 @@ def choose_move_minimax(state):
         best_value = -float('inf')
         for move in available_moves:
             new_state = transition(state, move)
-            value = minimax(new_state, float('inf'), -float('inf'), float('inf'), False)  # set a finite depth
+            value = minimax(new_state, float('inf'), -float('inf'), float('inf'), False)
             if value > best_value:
                 best_value = value
                 best_move = move
