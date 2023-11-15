@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
-# Load the dataset
+# dataset
 file_path = "D:\\facultate\\an3\\ai\\tema 5\\seeds_dataset.txt"
 data = np.genfromtxt(file_path)
 
@@ -16,7 +16,7 @@ Y_one_hot = np.eye(num_classes)[Y.astype(int) - 1]
 # training and testing sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y_one_hot, test_size=0.2, random_state=None)
 
-# initialize parameters with Glorot initialization
+# initialize parameters with glorot 
 def glorot_init(input_size, output_size):
     limit = np.sqrt(6 / (input_size + output_size))
     return np.random.uniform(-limit, limit, (input_size, output_size))
@@ -32,6 +32,10 @@ weights_input_hidden = glorot_init(input_size, hidden_size)
 bias_input_hidden = np.zeros((1, hidden_size))
 weights_hidden_output = glorot_init(hidden_size, output_size)
 bias_hidden_output = np.zeros((1, output_size))
+
+training_errors = []
+testing_errors = []
+
 # activation fct
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -66,6 +70,10 @@ for epoch in range(epochs):
     hidden_error = output_delta.dot(weights_hidden_output.T)
     hidden_delta = hidden_error * sigmoid_derivative(hidden_output)
 
+    # training error avg
+    training_error = np.mean(np.abs(output_error))
+    training_errors.append(training_error)
+
     # update weights and biases
     weights_hidden_output -= learning_rate * hidden_output.T.dot(output_delta)
     bias_hidden_output -= learning_rate * np.sum(output_delta)/210
@@ -77,11 +85,39 @@ for epoch in range(epochs):
 hidden_layer_test = sigmoid(np.dot(X_test, weights_input_hidden) + bias_input_hidden)
 predicted_output_test = softmax(np.dot(hidden_layer_test, weights_hidden_output) + bias_hidden_output)
 
-# # Convert the predicted probabilities to class labels
-# predicted_labels = np.argmax(predicted_output_test, axis=1) + 1
+# testing error avg
+testing_error = np.mean(np.abs(Y_test - predicted_output_test))
+testing_errors.append(testing_error)
 
-# # Convert one-hot encoded true labels to class labels
-# true_labels = np.argmax(Y_test, axis=1) + 1
+# plotting convergence
+plt.figure(figsize=(10, 5))
+plt.plot(range(epochs), training_errors, label='Training Error')
+plt.xlabel('epochs')
+plt.ylabel('error')
+plt.title('training convergence')
+plt.legend()
+plt.show()
+
+# visualization of misclassified points
+predicted_labels = np.argmax(predicted_output_test, axis=1) + 1
+true_labels = np.argmax(Y_test, axis=1) + 1
+
+misclassified_points = X_test[predicted_labels != true_labels]
+
+plt.figure(figsize=(8, 8))
+plt.scatter(X_test[:, 0], X_test[:, 1], c=true_labels, cmap=plt.cm.Paired, label='True Labels')
+plt.scatter(misclassified_points[:, 0], misclassified_points[:, 1], marker='x', c='r', label='Misclassified')
+plt.title('Misclassified Points')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.legend()
+plt.show()
+
+# convert the predicted probabilities to class labels
+predicted_labels = np.argmax(predicted_output_test, axis=1) + 1
+
+# convert one-hot encoded true labels to class labels
+true_labels = np.argmax(Y_test, axis=1) + 1
 
 # accuracy
 correct_predictions = np.sum(np.argmax(predicted_output_test, axis=1) == np.argmax(Y_test, axis=1))
