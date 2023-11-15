@@ -1,12 +1,10 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+
 # Load the dataset
 file_path = "D:\\facultate\\an3\\ai\\tema 5\\seeds_dataset.txt"
 data = np.genfromtxt(file_path)
-
-# shuffle the data
-np.random.shuffle(data)
 
 X = data[:, :-1]
 Y = data[:, -1]
@@ -16,22 +14,24 @@ num_classes = len(np.unique(Y))
 Y_one_hot = np.eye(num_classes)[Y.astype(int) - 1]
 
 # training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y_one_hot, test_size=0.2, random_state=None)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y_one_hot, test_size=0.3, random_state=None)
+# initialize parameters with Glorot initialization
+def glorot_init(input_size, output_size):
+    limit = np.sqrt(6 / (input_size + output_size))
+    return np.random.uniform(-limit, limit, (input_size, output_size))
 
-# initialize parameters
 input_size = X_train.shape[1]
 hidden_size = 4
 output_size = num_classes
 learning_rate = 0.05
-epochs = 50
+epochs = 200
 np.random.seed(42)
 
-weights_input_hidden = np.random.rand(input_size, hidden_size)
-bias_input_hidden = np.random.rand(1)
-weights_hidden_output = np.random.rand(hidden_size, output_size)
-bias_hidden_output = np.random.rand(1)
-
+weights_input_hidden = glorot_init(input_size, hidden_size)
+bias_input_hidden = np.zeros((1, hidden_size))
+weights_hidden_output = glorot_init(hidden_size, output_size)
+bias_hidden_output = np.zeros((1, output_size))
 # activation fct
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -46,6 +46,12 @@ def sigmoid_derivative(x):
 
 # training 
 for epoch in range(epochs):
+
+    np.random.seed(epoch)
+    np.random.shuffle(X_train)
+    np.random.seed(epoch)
+    np.random.shuffle(Y_train)
+    
     # fwd propagation
     hidden_input = np.dot(X_train, weights_input_hidden) + bias_input_hidden
     hidden_output = sigmoid(hidden_input)
