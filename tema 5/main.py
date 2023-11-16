@@ -1,6 +1,7 @@
 from random import shuffle
 from network import Network
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # reads the dataset and splits it between attributes & labels 
@@ -54,6 +55,25 @@ def main():
     network = Network(*init_layer_counts(input_data))
     network.train(train_set, 0.01, 100)
     (actual, predicted), results = network.test(test_set)
+    # indices of misclassified points
+    misclassified_indices = [i for i in range(len(actual)) if actual[i] != predicted[i]]
+
+    # correctly classified points green
+    plt.scatter(actual, predicted, c='g', label='Correctly Classified')
+
+    # misclassified points red
+    plt.scatter([actual[i] for i in misclassified_indices], [predicted[i] for i in misclassified_indices], c='r', label='Misclassified')
+
+    plt.xlabel('Actual')
+    plt.ylabel('Predicted')
+    plt.title('Actual vs Predicted - Misclassified Points Highlighted')
+    plt.legend()
+    plt.show()
+    for i in actual:
+        print(actual[i], end = " ")
+    print()
+    for i in predicted:
+        print(predicted[i], end = " ")
 
 if __name__ == "__main__":
     main()

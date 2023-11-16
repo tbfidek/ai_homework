@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 class Network():
     # init network w/ specified layer sizes
@@ -59,6 +58,7 @@ class Network():
         actual = [] # actual class labels
         predicted = [] # predicted class labels
         input_results = {} # input results vs correct results
+        
         for i in range(size):
             input_layer, binary_target = self.input_reshape(data_set, i) # input and target data
 
