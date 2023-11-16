@@ -12,16 +12,16 @@ def read_data(filename):
         # the labels dataset
         data_labels = []
         input_strings = []
-        max_input_length = 0 
+        max_input_length = 0
 
         for readline in fd:
-            string = readline.strip() # removes spaces
-            input_strings += [string] # adds value to the list
-        
+            string = readline.strip()  # removes spaces
+            input_strings += [string]  # adds value to the list
+
         shuffle(input_strings)
 
         labels_dict = {}
-   
+
         for string in input_strings:
             input_values = list(map(lambda x: float(x), string.split('\t')[:-1]))
             # number of attributes (all columns, except the last one)
@@ -35,6 +35,7 @@ def read_data(filename):
 
     return (np.array(data_input), np.array(data_labels)), max_input_length
 
+
 # splits the data into training and testing sets
 def split_input_data(input_data):
     split_point = int(len(input_data[0]) * 8 / 10)
@@ -42,38 +43,42 @@ def split_input_data(input_data):
     test_set = (input_data[0][split_point:], input_data[1][split_point:])
     return train_set, test_set
 
+
 # defines the number of neurons for each layer
 def init_layer_counts(input_data):
-    input_layer_count = len(input_data[0][0]) # 7 neuroni pt 7 atribute
-    output_layer_count = max(input_data[1]) + 1 # 3 neuroni pt 3 clase
+    input_layer_count = len(input_data[0][0])  # 7 neuroni pt 7 atribute
+    output_layer_count = max(input_data[1]) + 1  # 3 neuroni pt 3 clase
     hidden_layer_count = int(2 / 3 * (input_layer_count + output_layer_count))
     return input_layer_count, hidden_layer_count, output_layer_count
 
+
 def main():
-    input_data, _ = read_data('D:\\facultate\\an3\\ai\\tema 5\\seeds_dataset.txt') 
+    input_data, _ = read_data('seeds_dataset.txt')
     train_set, test_set = split_input_data(input_data)
     network = Network(*init_layer_counts(input_data))
-    network.train(train_set, 0.01, 100)
+    training_accuracies = network.train(train_set, 0.01, 100)
     (actual, predicted), results = network.test(test_set)
-    # indices of misclassified points
-    misclassified_indices = [i for i in range(len(actual)) if actual[i] != predicted[i]]
 
-    # correctly classified points green
-    plt.scatter(actual, predicted, c='g', label='Correctly Classified')
+    # Plot Training Accuracy over Epochs
+    plt.plot(range(1, len(training_accuracies) + 1), training_accuracies)
+    plt.xlabel('Epoch')
+    plt.ylabel('Training Accuracy (%)')
+    plt.title('Training Accuracy over Epochs')
+    plt.show()
 
-    # misclassified points red
-    plt.scatter([actual[i] for i in misclassified_indices], [predicted[i] for i in misclassified_indices], c='r', label='Misclassified')
+    misclassified_points = test_set[0][actual != predicted]
 
-    plt.xlabel('Actual')
-    plt.ylabel('Predicted')
-    plt.title('Actual vs Predicted - Misclassified Points Highlighted')
+    plt.scatter(test_set[0][:, 0], test_set[0][:, 1], label='Predicted')
+
+    if len(misclassified_points) > 0:
+        plt.scatter(misclassified_points[:, 0], misclassified_points[:, 1], label='Misclassified')
+
+    plt.xlabel('Attribute 1')
+    plt.ylabel('Attribute 2')
+    plt.title('Predicted vs Misclassified')
     plt.legend()
     plt.show()
-    for i in actual:
-        print(actual[i], end = " ")
-    print()
-    for i in predicted:
-        print(predicted[i], end = " ")
+
 
 if __name__ == "__main__":
     main()
