@@ -3,7 +3,6 @@ from network import Network
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # reads the dataset and splits it between attributes & labels 
 def read_data(filename):
     with open(filename, 'r') as fd:
@@ -53,7 +52,7 @@ def init_layer_counts(input_data):
 
 
 def main():
-    input_data, _ = read_data('seeds_dataset.txt')
+    input_data, _ = read_data('D:\\facultate\\an3\\ai\\tema 5\\seeds_dataset.txt')
     train_set, test_set = split_input_data(input_data)
     network = Network(*init_layer_counts(input_data))
     training_accuracies = network.train(train_set, 0.01, 100)
