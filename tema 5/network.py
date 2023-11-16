@@ -40,8 +40,7 @@ class Network():
         return hidden_layer_activation, output_layer_activation
     
     def cross_entropy_loss(self, predicted, target):
-        loss = -np.sum(target * np.log(predicted + 1e-15)) 
-        return loss
+        return -np.sum(target * np.log(predicted + 1e-15)) 
     
     def backpropagation(self, input_layer, binary_target, hidden_layer_activation, output_layer_activation, learning_rate):
         # error = predicted output - correct output for output layer
@@ -83,7 +82,7 @@ class Network():
         size = len(data_set[0])
         correct_count = 0
         training_accuracies = []
-        total_loss = 0
+
         for epoch in range(epochs_count):
             for i in range(size):
                 # transform input and target from vectors to matrices with one column for an easier multiplication
@@ -91,14 +90,13 @@ class Network():
                 hidden_layer_activation, output_layer_activation = self.fwd_propagation(input_layer)
 
                 loss = self.cross_entropy_loss(output_layer_activation, binary_target)
-                total_loss += loss
 
                 correct_count += int(np.argmax(output_layer_activation) == np.argmax(binary_target))
                 self.backpropagation(input_layer, binary_target, hidden_layer_activation, output_layer_activation, learning_rate)
             training_accuracies.append((correct_count / size) * 100)
             print(f"training accuracy (epoch {epoch}): {round((correct_count / size) * 100, 2)}%")
             correct_count = 0
-            # print(f"loss: {total_loss}")
+            print(f"loss: {loss}")
 
 
         return training_accuracies
