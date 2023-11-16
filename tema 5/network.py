@@ -41,7 +41,9 @@ class Network():
         return hidden_layer_activation, output_layer_activation
     
     def backpropagation(self, input_layer, binary_target, hidden_layer_activation, output_layer_activation, learning_rate):
+        # error = predicted output - correct output for output layer
         output_layer_delta = output_layer_activation - binary_target
+        # error for the hidden layer
         hidden_layer_delta = np.dot(np.transpose(self.output_layer_weights), output_layer_delta) * self.sigmoid_derivative(hidden_layer_activation)
 
         # adjusting weights & biases for output & hidden layer

@@ -52,7 +52,7 @@ def main():
     input_data, _ = read_data('D:\\facultate\\an3\\ai\\tema 5\\seeds_dataset.txt') 
     train_set, test_set = split_input_data(input_data)
     network = Network(*init_layer_counts(input_data))
-    network.train(train_set, 0.001, 100)
+    network.train(train_set, 0.001, 1)
     (actual, predicted), results = network.test(test_set)
 
 if __name__ == "__main__":
