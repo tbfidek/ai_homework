@@ -76,6 +76,7 @@ for episode in range(num_episodes):
         # update the Q-value
         old_value = Q_table[s[0], s[1], a]
         next_max = np.max(Q_table[s_prime[0], s_prime[1]])
+        # Bellman equation
         new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
         Q_table[s[0], s[1], a] = new_value
 
@@ -99,6 +100,18 @@ for i in range(num_rows):
 
 print(policy)
 
+arrow_symbols = ['↑', '↓', '←', '→']
+new_policy = [['' for _ in range(num_cols)] for _ in range(num_rows)]
+
+# map numeric actions to arrow symbols
+for i in range(num_rows):
+    for j in range(num_cols):
+        action_index = int(policy[i, j])  # Get the numeric action
+        new_policy[i][j] = arrow_symbols[action_index]  # Map to arrow symbol
+
+for row in new_policy:
+    print(' '.join(row))
+    
 # plot the total rewards per episode
 plt.plot(rewards_per_episode)
 plt.xlabel('Episode')
