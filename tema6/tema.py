@@ -2,36 +2,35 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
-# Dimensiunile grilei
+# grid
 num_rows = 7
 num_cols = 10
 
-# Numărul de acțiuni posibile (sus, jos, stânga, dreapta)
+# nr of actions (up, down, left, right)
 num_actions = 4
 
-# Inițializarea tabelei Q cu zero
+# init Q-table with 0 
 Q_table = np.zeros((num_rows, num_cols, num_actions))
 
-# Parametrii algoritmului
-alpha = 0.5  # Rata de învățare
-gamma = 0.95  # Factorul de discount
-epsilon = 0.1  # Probabilitatea de a alege o acțiune aleatoare (explorare)
+# learning_rate, discount_factor, exploration probability 
+alpha = 0.5 
+gamma = 0.95  
+epsilon = 0.1  
 
-# Starea inițială
+# init state
 initial_state = (3, 0)
 
-# Vântul sub fiecare coloană
+# wind for each column
 wind = [0, 0, 0, 1, 1, 1, 2, 2, 1, 0]
 
-
 def transition_state(s, a):
-    # Acțiunile sunt codificate ca: 0 = sus, 1 = jos, 2 = stânga, 3 = dreapta
+    # 0 = up, 1 = down, 2 = left, 3 = right
     actions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
-    # Aplicăm acțiunea
+    # taken action:
     next_s = (s[0] + actions[a][0], s[1] + actions[a][1])
 
-    # Verificăm dacă starea următoare este în afara grilei
+    # if action falls outside of the grid:
     if next_s[0] < 0:
         next_s = (0, next_s[1])
     elif next_s[0] >= num_rows:
@@ -42,97 +41,65 @@ def transition_state(s, a):
     elif next_s[1] >= num_cols:
         next_s = (next_s[0], num_cols - 1)
 
-    # Aplicăm vântul
+    # apply the wind
     next_s = (next_s[0] - wind[next_s[1]], next_s[1])
 
     return next_s
 
 
-# Numărul de episoade
+# nr of episodes
 num_episodes = 5000
 
-for episode in range(num_episodes):
-    # Inițializăm starea curentă
-    s = initial_state
+# policy init with 0
+policy = np.zeros((num_rows, num_cols))
 
-    for step in range(100):  # Limităm numărul de pași pe episod la 100
-        # Selectăm o acțiune
+# reward per episod
+rewards_per_episode = []
+
+for episode in range(num_episodes):
+    # init state and overall reward
+    s = initial_state
+    total_reward = 0
+
+    for step in range(100):  # limit nr of steps per episode
         if random.uniform(0, 1) < epsilon:
-            # Explorare: alegem o acțiune aleatoare
+            # exploration: choose a random action
             a = random.choice(range(num_actions))
         else:
-            # Exploatare: alegem acțiunea cu cea mai mare valoare Q
+            # exploitation: choose the action with the highest Q-value
             a = np.argmax(Q_table[s[0], s[1]])
 
-        # Obținem starea următoare și recompensa
+        # next state and reward
         s_prime = transition_state(s, a)
-        reward = -1  # Recompensa este -1 pentru toate tranzițiile
+        reward = -1  # the reward is -1 for all transitions
 
-        # Actualizăm valoarea Q
+        # update the Q-value
         old_value = Q_table[s[0], s[1], a]
         next_max = np.max(Q_table[s_prime[0], s_prime[1]])
         new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
         Q_table[s[0], s[1], a] = new_value
 
-        # Actualizăm starea curentă
+        # update the current state
         s = s_prime
 
-        # Verificăm dacă am ajuns la obiectiv
+        # update the total reward
+        total_reward += reward
+
+        # check if goal was reached
         if s == (3, 7):
             break
 
-# Inițializăm politica cu zero
-policy = np.zeros((num_rows, num_cols))
+    # total reward per episode
+    rewards_per_episode.append(total_reward)
 
-# Pentru fiecare stare, alegem acțiunea cu cea mai mare valoare Q
+# for each state, choose max Q-value
 for i in range(num_rows):
     for j in range(num_cols):
         policy[i, j] = np.argmax(Q_table[i, j])
 
-# Afișăm politica
 print(policy)
 
-# Initialize the list to store the total rewards per episode
-rewards_per_episode = []
-
-for episode in range(num_episodes):
-    # Initialize the current state and the total reward
-    s = initial_state
-    total_reward = 0
-
-    for step in range(100):  # Limit the number of steps per episode to 100
-        # Select an action
-        if random.uniform(0, 1) < epsilon:
-            # Exploration: choose a random action
-            a = random.choice(range(num_actions))
-        else:
-            # Exploitation: choose the action with the highest Q-value
-            a = np.argmax(Q_table[s[0], s[1]])
-
-        # Get the next state and reward
-        s_prime = transition_state(s, a)
-        reward = -1  # The reward is -1 for all transitions
-
-        # Update the Q-value
-        old_value = Q_table[s[0], s[1], a]
-        next_max = np.max(Q_table[s_prime[0], s_prime[1]])
-        new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-        Q_table[s[0], s[1], a] = new_value
-
-        # Update the current state
-        s = s_prime
-
-        # Update the total reward
-        total_reward += reward
-
-        # Check if we have reached the goal
-        if s == (3, 7):
-            break
-
-    # Append the total reward for this episode to the list
-    rewards_per_episode.append(total_reward)
-
-# Plot the total rewards per episode
+# plot the total rewards per episode
 plt.plot(rewards_per_episode)
 plt.xlabel('Episode')
 plt.ylabel('Total Reward')
